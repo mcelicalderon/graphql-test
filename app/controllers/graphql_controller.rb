@@ -1,4 +1,6 @@
 class GraphqlController < ApplicationController
+  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
+
   def execute
     variables = ensure_hash(params[:variables])
     query = params[:query]
@@ -29,5 +31,10 @@ class GraphqlController < ApplicationController
     else
       raise ArgumentError, "Unexpected parameter: #{ambiguous_param}"
     end
+  end
+
+  def render_not_found(exception)
+    message = "Could not find #{exception.model} with ID: #{exception.id}"
+    render json: { errors: [message] }, status: :not_found
   end
 end
