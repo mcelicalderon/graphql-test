@@ -3,14 +3,14 @@ class Mutations::UpdateUser < Mutations::BaseMutation
   argument :first_name, String, required: true
   argument :last_name, String, required: true
   argument :email, String, required: true
-  argument :birthday, Types::DateType, required: true
+  argument :birthday, Types::DateType, required: false
 
   field :user, Types::UserType, null: true
   field :errors, [String], null: false
 
-  def resolve(id: nil, first_name: nil, last_name: nil, email: nil, birthday: nil)
-    user = User.find(id)
-    if user.update(first_name: first_name, last_name: last_name, email: email, birthday: birthday)
+  def resolve(attrs = {})
+    user = User.find(attrs[:id])
+    if user.update(attrs)
       {
         user: user,
         errors: []
