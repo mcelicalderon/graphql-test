@@ -1,4 +1,8 @@
 class GraphqlController < ApplicationController
+  include DeviseTokenAuth::Concerns::SetUserByToken
+
+  before_action :authenticate_user!
+
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
 
   def execute
@@ -6,8 +10,7 @@ class GraphqlController < ApplicationController
     query = params[:query]
     operation_name = params[:operationName]
     context = {
-      # Query context goes here, for example:
-      # current_user: current_user,
+      current_user: current_user
     }
     result = GraphqlTestSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
